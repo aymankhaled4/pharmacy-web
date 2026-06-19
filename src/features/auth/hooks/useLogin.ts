@@ -16,6 +16,17 @@ interface RoleResponse {
   pharmacyStatus?: string;
 }
 
+function getUserDisplayName(metadata: Record<string, unknown> | null | undefined) {
+  const value =
+    metadata?.name ??
+    metadata?.full_name ??
+    metadata?.display_name ??
+    metadata?.user_name ??
+    metadata?.pharmacy_name;
+
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
 export function useLogin() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -42,7 +53,11 @@ export function useLogin() {
       return {
         token,
         role: roleData.role,
-        user: { id: data.user.id, email: data.user.email } as AuthUser,
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          name: getUserDisplayName(data.user.user_metadata),
+        } as AuthUser,
       };
     },
     onSuccess: ({ token, role, user }) => {

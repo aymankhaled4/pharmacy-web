@@ -1,14 +1,17 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Building2,
   Users,
   ClipboardList,
+  LogOut,
+  X,
 } from 'lucide-react';
 import { useAuthStore } from '../core/auth/auth.store';
 import { supabase } from '../core/supabase/supabase.client';
+import Topbar from '../components/shared/Topbar';
 import logo from '../assets/Dawak_logo.png';
-import icon from '../assets/Dawak_icon.png';
 import { cn } from '../lib/utils';
 
 const navItems = [
@@ -18,9 +21,30 @@ const navItems = [
   { to: '/admin/reservations', icon: ClipboardList, label: 'Reservations' },
 ];
 
+const searchHints = [
+  {
+    path: '/admin/dashboard',
+    hint: 'Search analytics, pharmacies, reservations, medicines...',
+  },
+  {
+    path: '/admin/pharmacies',
+    hint: 'Search pharmacies by name, license, location, status...',
+  },
+  {
+    path: '/admin/users',
+    hint: 'Search users by name, email, role, account status...',
+  },
+  {
+    path: '/admin/reservations',
+    hint: 'Search reservations by patient, pharmacy, medicine, status...',
+  },
+];
+
 export default function AdminLayout() {
-  const { user, clearAuth } = useAuthStore();
+  const { clearAuth } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -28,58 +52,83 @@ export default function AdminLayout() {
     navigate('/login', { replace: true });
   };
 
+  const sidebarContent = (
+    <>
+      <div className="flex h-16 items-center justify-between border-b px-6">
+        <img src={logo} alt="Dawak" className="h-8 w-auto" />
+        <button
+          type="button"
+          onClick={() => setIsSidebarOpen(false)}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden"
+          aria-label="Close navigation"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+
+      <nav className="flex-1 space-y-1 px-3 py-4">
+        {navItems.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            onClick={() => setIsSidebarOpen(false)}
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                isActive
+                  ? 'bg-[#014AB3] text-white'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              )
+            }
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="border-t p-3">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="flex w-64 flex-col border-r bg-white">
-        <div className="flex h-16 items-center border-b px-6">
-          <img src={logo} alt="Dawak" className="h-8 w-auto" />
-        </div>
-
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          {navItems.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-[#014AB3] text-white'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                )
-              }
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="border-t p-3">
-          <button
-            onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Logout
-          </button>
-        </div>
+      <aside className="hidden w-64 shrink-0 flex-col border-r bg-white lg:flex">
+        {sidebarContent}
       </aside>
 
-      {/* Main */}
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between border-b bg-white px-6">
-          <div />
-          <div className="flex items-center gap-3">
-            <img src={icon} alt="" className="h-8 w-8 rounded-full" />
-            <span className="text-sm font-medium text-gray-700">{user?.email}</span>
-          </div>
-        </header>
+      {isSidebarOpen && (
+        <div className="fixed inset-0 z-30 lg:hidden">
+          <button
+            type="button"
+            aria-label="Close navigation overlay"
+            onClick={() => setIsSidebarOpen(false)}
+            className="absolute inset-0 bg-black/30"
+          />
+          <aside className="relative flex h-full w-72 max-w-[82vw] flex-col border-r bg-white shadow-xl">
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
 
-        <main className="flex-1 p-6">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Topbar
+          searchPlaceholder={
+            searchHints.find((item) => location.pathname.startsWith(item.path))?.hint ??
+            'Search admin workspace...'
+          }
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+        />
+
+        <main className="flex-1 p-4 sm:p-6">
           <Outlet />
         </main>
       </div>
