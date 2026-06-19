@@ -6,10 +6,11 @@ import { supabase } from '../../core/supabase/supabase.client';
 interface TopbarProps {
   searchPlaceholder: string;
   onOpenSidebar?: () => void;
+  fallbackName?: string;
 }
 
-function toTitleName(email?: string | null) {
-  if (!email) return 'Admin User';
+function toTitleName(email?: string | null, fallbackName = 'Admin User') {
+  if (!email) return fallbackName;
 
   return email
     .split('@')[0]
@@ -17,7 +18,7 @@ function toTitleName(email?: string | null) {
     .split(' ')
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ') || 'Admin User';
+    .join(' ') || fallbackName;
 }
 
 function getMetadataName(metadata: Record<string, unknown> | null | undefined) {
@@ -31,7 +32,11 @@ function getMetadataName(metadata: Record<string, unknown> | null | undefined) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
-export default function Topbar({ searchPlaceholder, onOpenSidebar }: TopbarProps) {
+export default function Topbar({
+  searchPlaceholder,
+  onOpenSidebar,
+  fallbackName = 'Admin User',
+}: TopbarProps) {
   const user = useAuthStore((state) => state.user);
   const [metadataName, setMetadataName] = useState<string | undefined>(user?.name);
 
@@ -49,8 +54,8 @@ export default function Topbar({ searchPlaceholder, onOpenSidebar }: TopbarProps
   }, []);
 
   const displayName = useMemo(
-    () => user?.name || metadataName || toTitleName(user?.email),
-    [metadataName, user?.email, user?.name]
+    () => user?.name || metadataName || toTitleName(user?.email, fallbackName),
+    [fallbackName, metadataName, user?.email, user?.name]
   );
   const initial = displayName.trim().charAt(0).toUpperCase() || 'A';
 
