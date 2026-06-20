@@ -1,23 +1,100 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
+import type { ComponentProps, ReactNode } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
-function DataTable({
+/** Simple bordered container used by pharmacy reservations and similar pages. */
+export default function DataTable({
   className,
   children,
   ...props
-}: React.ComponentProps<'div'>) {
+}: ComponentProps<'div'>) {
   return (
     <div
       data-slot="data-table"
       className={cn(
         'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm',
-        className,
+        className
       )}
       {...props}
     >
       {children}
     </div>
-  )
+  );
 }
 
-export default DataTable
+export interface DataTableColumn<T> {
+  id: string;
+  header: ReactNode;
+  cell: (row: T) => ReactNode;
+  className?: string;
+  headerClassName?: string;
+}
+
+interface DataTableGridProps<T> {
+  columns: DataTableColumn<T>[];
+  data: T[];
+  getRowKey: (row: T) => string;
+  emptyMessage?: string;
+  isLoading?: boolean;
+  rowClassName?: (row: T) => string | undefined;
+}
+
+/** Column-driven table for admin list pages. */
+export function DataTableGrid<T>({
+  columns,
+  data,
+  getRowKey,
+  emptyMessage = 'No records found.',
+  isLoading = false,
+  rowClassName,
+}: DataTableGridProps<T>) {
+  if (isLoading) {
+    return (
+      <div className="rounded-xl border bg-white px-6 py-16 text-center text-sm text-muted-foreground">
+        Loading...
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="rounded-xl border bg-white px-6 py-16 text-center text-sm text-muted-foreground">
+        {emptyMessage}
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-xl border bg-white">
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
+            {columns.map((column) => (
+              <TableHead key={column.id} className={column.headerClassName}>
+                {column.header}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.map((row) => (
+            <TableRow key={getRowKey(row)} className={cn(rowClassName?.(row))}>
+              {columns.map((column) => (
+                <TableCell key={column.id} className={column.className}>
+                  {column.cell(row)}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
