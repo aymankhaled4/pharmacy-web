@@ -4,6 +4,7 @@ import {
   Building2,
   CalendarDays,
   Download,
+  Search,
   Users,
 } from 'lucide-react';
 import {
@@ -26,10 +27,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import ActivityFeedList from '../components/ActivityFeedList';
 import KpiCard from '../components/KpiCard';
 import TopPurchasedChart from '../components/TopPurchasedChart';
-import { useActivityFeed } from '../hooks/useActivityFeed';
 import { useAnalyticsOverview } from '../hooks/useAnalyticsOverview';
 import { useRecentReservations, type AdminReservation, type AdminReservationStatus } from '../hooks/useRecentReservations';
 import { useTopPurchasedDrugs, type TopPurchasedDrug } from '../hooks/useTopPurchasedDrugs';
@@ -121,10 +120,9 @@ function buildWeeklyReservationData(reservations: AdminReservation[]) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function AdminDashboardPage() {
   const [showAllBookings, setShowAllBookings] = useState(false);
-  const [showAllActivity, setShowAllActivity] = useState(false);
+  const [reservationSearch, setReservationSearch] = useState('');
 
   const overview = useAnalyticsOverview();
-  const activityFeed = useActivityFeed(showAllActivity ? 50 : 6);
   const purchased = useTopPurchasedDrugs(5);
   const recentReservations = useRecentReservations(100);
 
@@ -136,8 +134,26 @@ export default function AdminDashboardPage() {
     [purchased.data],
   );
 
+  const filteredReservations = useMemo(() => {
+    const query = reservationSearch.trim().toLowerCase();
+    if (!query) return reservations;
+
+    return reservations.filter((reservation) => {
+      const searchableValues = [
+        getUserName(reservation),
+        getPharmacyName(reservation),
+        getDrugName(reservation),
+        reservation.status,
+        statusConfig[reservation.status]?.label,
+        formatRelativeTime(reservation.created_at),
+      ];
+
+      return searchableValues.some((value) => value.toLowerCase().includes(query));
+    });
+  }, [reservationSearch, reservations]);
+
   // 5 reservations by default, all if expanded
-  const visibleReservations = showAllBookings ? reservations : reservations.slice(0, 5);
+  const visibleReservations = showAllBookings ? filteredReservations : filteredReservations.slice(0, 5);
 
   const topMedicine = sortedPurchased[0] ? getRequestedMedicineName(sortedPurchased[0]) : 'No data yet';
   const weeklyReservationData = useMemo(() => buildWeeklyReservationData(reservations), [reservations]);
@@ -249,125 +265,102 @@ export default function AdminDashboardPage() {
         <TopPurchasedChart items={sortedPurchased} isLoading={purchased.isLoading} />
       </div>
 
-      {/* ── Reservations Table + Activity Feed ── */}
-      <div
-        className={cn(
-          'grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)]',
-          showAllBookings || showAllActivity ? 'items-start' : 'items-stretch',
-        )}
-      >
-        {/* Reservations Table */}
-        <Card className={cn('flex flex-col rounded-lg border-0 bg-white shadow-sm ring-1 ring-gray-200/70', !showAllBookings && !showAllActivity && 'h-full')}>
-          <CardHeader className="items-start gap-3 border-b sm:flex sm:flex-row sm:justify-between">
-            <div>
-              <CardTitle>Recent Reservations</CardTitle>
-              <CardDescription>Overview of the latest system bookings</CardDescription>
+      {/* ── Reservations Table ── */}
+      <Card className="flex flex-col rounded-lg border-0 bg-white shadow-sm ring-1 ring-gray-200/70">
+        <CardHeader className="items-start gap-4 border-b lg:flex lg:flex-row lg:justify-between">
+          <div>
+            <CardTitle>Recent Reservations</CardTitle>
+            <CardDescription>Overview of the latest system bookings</CardDescription>
+          </div>
+          <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto lg:items-center">
+            <div className="relative w-full sm:w-80">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="search"
+                value={reservationSearch}
+                onChange={(event) => {
+                  setReservationSearch(event.target.value);
+                  setShowAllBookings(false);
+                }}
+                placeholder="Search user, pharmacy, medicine, status, time..."
+                className="h-9 w-full rounded-lg border bg-gray-50 pl-10 pr-3 text-xs text-gray-800 outline-none transition focus:border-[#014AB3] focus:bg-white focus:ring-2 focus:ring-[#014AB3]/10"
+              />
             </div>
             <Button
               type="button"
               variant="link"
-              className="text-[#014AB3]"
+              className="justify-start text-[#014AB3] lg:justify-center"
               onClick={() => setShowAllBookings((current) => !current)}
-              disabled={reservations.length <= 5}
+              disabled={filteredReservations.length <= 5}
             >
               {showAllBookings ? 'Show Latest 5' : 'View All Bookings'}
             </Button>
-          </CardHeader>
-          <CardContent className={cn('p-0', !showAllBookings && !showAllActivity && 'flex-1', showAllBookings && 'max-h-[42rem] overflow-y-auto [scrollbar-gutter:stable]')}>
-              <Table className="table-fixed">
-                <colgroup>
-                  <col className="w-[20%]" />
-                  <col className="w-[23%]" />
-                  <col className="w-[27%]" />
-                  <col className="w-[15%]" />
-                  <col className="w-[15%]" />
-                </colgroup>
-                <TableHeader>
-                  <TableRow className="border-b border-gray-100 bg-gray-50/80 hover:bg-gray-50/80">
-                    <TableHead className="py-3.5 pl-6 pr-3 text-xs font-semibold uppercase tracking-wide text-gray-500">User</TableHead>
-                    <TableHead className="py-3.5 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Pharmacy</TableHead>
-                    <TableHead className="py-3.5 px-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Medicine</TableHead>
-                    <TableHead className="py-3.5 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</TableHead>
-                    <TableHead className="py-3.5 pl-3 pr-6 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Time</TableHead>
+          </div>
+        </CardHeader>
+        <CardContent className={cn('p-0', showAllBookings && 'max-h-[42rem] overflow-y-auto [scrollbar-gutter:stable]')}>
+          <Table className="table-fixed">
+            <colgroup>
+              <col className="w-[20%]" />
+              <col className="w-[23%]" />
+              <col className="w-[27%]" />
+              <col className="w-[15%]" />
+              <col className="w-[15%]" />
+            </colgroup>
+            <TableHeader>
+              <TableRow className="border-b border-gray-100 bg-gray-50/80 hover:bg-gray-50/80">
+                <TableHead className="py-3.5 pl-6 pr-3 text-xs font-semibold uppercase tracking-wide text-gray-500">User</TableHead>
+                <TableHead className="py-3.5 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Pharmacy</TableHead>
+                <TableHead className="py-3.5 px-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Medicine</TableHead>
+                <TableHead className="py-3.5 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</TableHead>
+                <TableHead className="py-3.5 pl-3 pr-6 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentReservations.isLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index} className="border-0">
+                    <TableCell colSpan={5} className="pl-6 pr-6 py-4">
+                      <div className="h-5 animate-pulse rounded bg-gray-100" />
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentReservations.isLoading ? (
-                    Array.from({ length: 5 }).map((_, index) => (
-                      <TableRow key={index} className="border-0">
-                        <TableCell colSpan={5} className="pl-6 pr-6 py-4">
-                          <div className="h-5 animate-pulse rounded bg-gray-100" />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : visibleReservations.length ? (
-                    visibleReservations.map((reservation) => (
-                      <TableRow
-                        key={reservation.id}
-                        className="border-0 bg-white transition-colors hover:bg-gray-50/50"
-                      >
-                        <TableCell className="py-5 pl-6 pr-3 text-sm font-semibold text-gray-900 whitespace-normal break-words">
-                          {getUserName(reservation)}
-                        </TableCell>
-                        <TableCell className="py-5 px-3 text-sm text-gray-600 whitespace-normal break-words">
-                          {getPharmacyName(reservation)}
-                        </TableCell>
-                        <TableCell className="py-5 px-3 text-sm text-gray-600 whitespace-normal break-words">
-                          {getDrugName(reservation)}
-                        </TableCell>
-                        <TableCell className="py-5 px-3 whitespace-normal">
-                          <StatusBadge status={reservation.status} />
-                        </TableCell>
-                        <TableCell className="py-5 pl-3 pr-6 text-right text-xs text-gray-400 whitespace-normal">
-                          {formatRelativeTime(reservation.created_at)}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-28 text-center text-sm text-gray-500">
-                        No recent reservations yet.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-          </CardContent>
-        </Card>
-
-        {/* Activity Feed */}
-        <div className={cn('grid gap-4', !showAllBookings && !showAllActivity && 'h-full')}>
-          <Card className={cn('flex flex-col rounded-lg border-0 bg-white shadow-sm ring-1 ring-gray-200/70', !showAllBookings && !showAllActivity && 'h-full')}>
-            <CardHeader className="border-b">
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-[#014AB3]" />
-                Activity Feed
-              </CardTitle>
-            </CardHeader>
-            <CardContent className={cn('flex flex-col gap-4 pt-4', !showAllBookings && !showAllActivity && 'flex-1')}>
-              <div className={cn('pr-1', showAllActivity ? 'max-h-[42rem] overflow-y-auto' : 'overflow-hidden')}>
-                <ActivityFeedList
-                  items={activityFeed.data?.items ?? []}
-                  isLoading={activityFeed.isLoading}
-                  loadingItemCount={6}
-                />
-              </div>
-
-              <Button
-                type="button"
-                variant="secondary"
-                className="w-full bg-blue-50 text-[#014AB3] hover:bg-blue-100"
-                onClick={() => setShowAllActivity((prev) => !prev)}
-              >
-                {showAllActivity ? 'Show Less' : 'View Full Logs'}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+                ))
+              ) : visibleReservations.length ? (
+                visibleReservations.map((reservation) => (
+                  <TableRow
+                    key={reservation.id}
+                    className="border-0 bg-white transition-colors hover:bg-gray-50/50"
+                  >
+                    <TableCell className="py-5 pl-6 pr-3 text-sm font-semibold text-gray-900 whitespace-normal break-words">
+                      {getUserName(reservation)}
+                    </TableCell>
+                    <TableCell className="py-5 px-3 text-sm text-gray-600 whitespace-normal break-words">
+                      {getPharmacyName(reservation)}
+                    </TableCell>
+                    <TableCell className="py-5 px-3 text-sm text-gray-600 whitespace-normal break-words">
+                      {getDrugName(reservation)}
+                    </TableCell>
+                    <TableCell className="py-5 px-3 whitespace-normal">
+                      <StatusBadge status={reservation.status} />
+                    </TableCell>
+                    <TableCell className="py-5 pl-3 pr-6 text-right text-xs text-gray-400 whitespace-normal">
+                      {formatRelativeTime(reservation.created_at)}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-28 text-center text-sm text-gray-500">
+                    {reservationSearch ? 'No reservations match your search.' : 'No recent reservations yet.'}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <div className="sr-only" aria-live="polite">
-        {overview.isError || activityFeed.isError || purchased.isError || recentReservations.isError
+        {overview.isError || purchased.isError || recentReservations.isError
           ? 'Some dashboard data could not be loaded.'
           : 'Dashboard loaded.'}
       </div>
