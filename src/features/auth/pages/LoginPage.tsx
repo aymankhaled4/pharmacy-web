@@ -9,12 +9,11 @@ export default function LoginPage() {
   const successMessage = location.state?.successMessage as string | undefined;
 
   useEffect(() => {
-    if (successMessage) {
-      toast.success(successMessage);
-      // Clear state so it doesn't show again on back navigation
-      navigate('/login', { replace: true, state: {} });
-    }
-  }, []);
+  if (successMessage) {
+    toast.success(successMessage);
+    navigate('/login', { replace: true, state: {} });
+  }
+  }, []); // eslint-disable-line 
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
