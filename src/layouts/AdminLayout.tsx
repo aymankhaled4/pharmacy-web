@@ -14,6 +14,7 @@ import { supabase } from '../core/supabase/supabase.client';
 import Topbar from '../components/shared/Topbar';
 import logo from '../assets/Dawak_logo.png';
 import { cn } from '../lib/utils';
+import AdminNotificationsDropdown from '../features/admin/notifications/components/AdminNotificationsDropdown';
 
 const navItems = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -51,6 +52,7 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const isDashboard = location.pathname.startsWith('/admin/dashboard');
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -131,6 +133,8 @@ export default function AdminLayout() {
             searchHints.find((item) => location.pathname.startsWith(item.path))?.hint ??
             'Search admin workspace...'
           }
+          showSearch={!isDashboard}
+          notificationDropdown={<AdminNotificationsDropdown />}
           onOpenSidebar={() => setIsSidebarOpen(true)}
         />
 
