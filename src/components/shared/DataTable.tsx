@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import {
   Table,
   TableBody,
@@ -9,6 +9,26 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 
+/** Simple bordered container used by pharmacy reservations and similar pages. */
+export default function DataTable({
+  className,
+  children,
+  ...props
+}: ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="data-table"
+      className={cn(
+        'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
 export interface DataTableColumn<T> {
   id: string;
   header: ReactNode;
@@ -17,7 +37,7 @@ export interface DataTableColumn<T> {
   headerClassName?: string;
 }
 
-interface DataTableProps<T> {
+interface DataTableGridProps<T> {
   columns: DataTableColumn<T>[];
   data: T[];
   getRowKey: (row: T) => string;
@@ -26,14 +46,15 @@ interface DataTableProps<T> {
   rowClassName?: (row: T) => string | undefined;
 }
 
-export default function DataTable<T>({
+/** Column-driven table for admin list pages. */
+export function DataTableGrid<T>({
   columns,
   data,
   getRowKey,
   emptyMessage = 'No records found.',
   isLoading = false,
   rowClassName,
-}: DataTableProps<T>) {
+}: DataTableGridProps<T>) {
   if (isLoading) {
     return (
       <div className="rounded-xl border bg-white px-6 py-16 text-center text-sm text-muted-foreground">
