@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Building2,
   Users,
-  ClipboardList,
   ShieldCheck,
   LogOut,
   X,
@@ -21,30 +20,6 @@ const navItems = [
   { to: '/admin/verification', icon: ShieldCheck, label: 'Verification' },
   { to: '/admin/users', icon: Users, label: 'Users' },
   { to: '/admin/pharmacies', icon: Building2, label: 'Pharmacies' },
-  { to: '/admin/reservations', icon: ClipboardList, label: 'Reservations' },
-];
-
-const searchHints = [
-  {
-    path: '/admin/dashboard',
-    hint: 'Search analytics, pharmacies, reservations, medicines...',
-  },
-  {
-    path: '/admin/verification',
-    hint: 'Search pending pharmacies by name, license, or location...',
-  },
-  {
-    path: '/admin/pharmacies',
-    hint: 'Search pharmacies by name, license, location, status...',
-  },
-  {
-    path: '/admin/users',
-    hint: 'Search users by name, email, role, account status...',
-  },
-  {
-    path: '/admin/reservations',
-    hint: 'Search reservations by patient, pharmacy, medicine, status...',
-  },
 ];
 
 export default function AdminLayout() {
@@ -129,10 +104,6 @@ export default function AdminLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
-          searchPlaceholder={
-            searchHints.find((item) => location.pathname.startsWith(item.path))?.hint ??
-            'Search admin workspace...'
-          }
           showSearch={!isDashboard}
           notificationDropdown={<AdminNotificationsDropdown />}
           onOpenSidebar={() => setIsSidebarOpen(true)}

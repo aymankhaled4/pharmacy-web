@@ -17,11 +17,11 @@ const labels: Record<PharmacyStatus, string> = {
   rejected: 'Suspended',
 }
 
-const icons = {
+const icons: Record<PharmacyStatus, typeof Clock3> = {
   pending: Clock3,
   approved: CheckCircle2,
   rejected: Ban,
-} satisfies Record<PharmacyStatus, typeof Clock3>
+}
 
 interface PharmacyStatusBadgeProps {
   status: PharmacyStatus

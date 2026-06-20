@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Bell, Menu, Search } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import { useAuthStore } from '../../core/auth/auth.store';
 import { supabase } from '../../core/supabase/supabase.client';
 
 interface TopbarProps {
-  searchPlaceholder: string;
   onOpenSidebar?: () => void;
   fallbackName?: string;
   showSearch?: boolean;
@@ -36,10 +35,8 @@ function getMetadataName(metadata: Record<string, unknown> | null | undefined) {
 }
 
 export default function Topbar({
-  searchPlaceholder,
   onOpenSidebar,
   fallbackName = 'Admin User',
-  showSearch = true,
   notificationDropdown,
 }: TopbarProps) {
   const user = useAuthStore((state) => state.user);
@@ -76,17 +73,6 @@ export default function Topbar({
           >
             <Menu className="h-5 w-5" />
           </button>
-
-          {showSearch && (
-            <div className="relative w-full min-w-0 sm:w-[22rem] lg:w-[26rem]">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                type="search"
-                placeholder={searchPlaceholder}
-                className="h-9 w-full rounded-lg border bg-gray-50 pl-10 pr-3 text-xs text-gray-800 outline-none transition focus:border-[#014AB3] focus:bg-white focus:ring-2 focus:ring-[#014AB3]/10"
-              />
-            </div>
-          )}
         </div>
 
         <div className="flex items-center justify-end gap-3">

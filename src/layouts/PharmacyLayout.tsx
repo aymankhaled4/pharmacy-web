@@ -1,11 +1,8 @@
 import { useState } from 'react';
-import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard,
   Package,
-  Upload,
   ClipboardList,
-  Bell,
   User,
   LogOut,
   X,
@@ -17,45 +14,14 @@ import logo from '../assets/Dawak_logo.png';
 import { cn } from '../lib/utils';
 
 const navItems = [
-  { to: '/pharmacy/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/pharmacy/inventory', icon: Package, label: 'Inventory' },
-  { to: '/pharmacy/import', icon: Upload, label: 'Import' },
   { to: '/pharmacy/reservations', icon: ClipboardList, label: 'Reservations' },
-  { to: '/pharmacy/notifications', icon: Bell, label: 'Notifications' },
   { to: '/pharmacy/profile', icon: User, label: 'Profile' },
-];
-
-const searchHints = [
-  {
-    path: '/pharmacy/dashboard',
-    hint: 'Search pharmacy stats, inventory, reservations, medicines...',
-  },
-  {
-    path: '/pharmacy/inventory',
-    hint: 'Search inventory by medicine, batch, price, quantity, expiry...',
-  },
-  {
-    path: '/pharmacy/import',
-    hint: 'Search import files, medicines, matched items, upload results...',
-  },
-  {
-    path: '/pharmacy/reservations',
-    hint: 'Search reservations by patient, medicine, pickup code, status...',
-  },
-  {
-    path: '/pharmacy/notifications',
-    hint: 'Search notifications by title, message, type, read status...',
-  },
-  {
-    path: '/pharmacy/profile',
-    hint: 'Search profile fields, pharmacy details, license, location...',
-  },
 ];
 
 export default function PharmacyLayout() {
   const { clearAuth } = useAuthStore();
   const navigate = useNavigate();
-  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -133,10 +99,6 @@ export default function PharmacyLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
-          searchPlaceholder={
-            searchHints.find((item) => location.pathname.startsWith(item.path))?.hint ??
-            'Search pharmacy workspace...'
-          }
           fallbackName="Pharmacy User"
           onOpenSidebar={() => setIsSidebarOpen(true)}
         />
