@@ -9,7 +9,7 @@ export function useApprovePharmacy() {
 
   return useMutation({
     mutationFn: (pharmacyId: string) =>
-      api.post(ENDPOINTS.ADMIN_PHARMACY_APPROVE(pharmacyId)),
+      api.post(ENDPOINTS.ADMIN_PHARMACY_APPROVE(pharmacyId), {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-pharmacies'] });
       queryClient.invalidateQueries({ queryKey: ['admin-pharmacies'] });
