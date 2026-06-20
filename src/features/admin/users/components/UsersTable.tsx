@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatLastLogin, formatRoleTag } from '@/lib/format';
+import { formatLastLogin } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import type { AdminUser } from '@/features/admin/types/admin.types';
 
@@ -111,7 +111,7 @@ export default function UsersTable({
                 >
                   {column.label}
                   {column.id === 'lastLogin' && (
-                    <ArrowUpDown className="h-3.5 w-3.5 text-gray-400" />
+                    <ArrowUpDown className="h-3.5 w-3.5 text-[#014AB3]" />
                   )}
                 </div>
               </TableHead>
@@ -154,19 +154,14 @@ export default function UsersTable({
                 <TableCell className="px-4 py-4">
                   <div className="flex items-center gap-3">
                     <UserAvatar name={user.full_name} />
-                    <div>
-                      <p
-                        className={cn(
-                          'font-semibold text-gray-900',
-                          isInactive && 'text-muted-foreground line-through'
-                        )}
-                      >
-                        {user.full_name}
-                      </p>
-                      <p className="text-[11px] font-medium tracking-[0.08em] text-gray-400 uppercase">
-                        {formatRoleTag(user.role)}
-                      </p>
-                    </div>
+                    <p
+                      className={cn(
+                        'font-semibold text-gray-900',
+                        isInactive && 'text-muted-foreground line-through'
+                      )}
+                    >
+                      {user.full_name}
+                    </p>
                   </div>
                 </TableCell>
 
@@ -183,7 +178,7 @@ export default function UsersTable({
                 </TableCell>
 
                 <TableCell className="px-4 py-4">
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm font-medium text-[#014AB3]">
                     {formatLastLogin(user.last_login)}
                   </span>
                 </TableCell>

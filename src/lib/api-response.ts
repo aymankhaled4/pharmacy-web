@@ -48,10 +48,20 @@ function resolveUserRole(raw: Record<string, unknown>): UserManagementRole {
   return raw.role === 'admin' ? 'admin' : 'user';
 }
 
+function resolveDisplayName(raw: Record<string, unknown>): string {
+  const value = raw.full_name ?? raw.name ?? raw.display_name;
+  if (typeof value !== 'string') return 'Unnamed User';
+
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.toLowerCase() === 'unknown user') return 'Unnamed User';
+
+  return trimmed;
+}
+
 export function mapAdminUser(raw: Record<string, unknown>) {
   return {
     id: String(raw.id ?? ''),
-    full_name: String(raw.full_name ?? raw.name ?? raw.display_name ?? 'Unknown User'),
+    full_name: resolveDisplayName(raw),
     email: String(raw.email ?? ''),
     phone:
       typeof raw.phone === 'string' && raw.phone.trim() ? raw.phone : null,

@@ -12,6 +12,14 @@ export interface AdminPharmacy {
   created_at: string;
 }
 
+export interface CreateAdminUserPayload {
+  email: string;
+  password: string;
+  full_name: string;
+  role?: UserManagementRole;
+  phone?: string;
+}
+
 export interface AdminUser {
   id: string;
   full_name: string;

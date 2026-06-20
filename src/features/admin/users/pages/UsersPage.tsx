@@ -5,6 +5,8 @@ import CursorPagination from '@/components/shared/CursorPagination';
 import FilterSelect from '@/components/shared/FilterSelect';
 import UsersTable from '../components/UsersTable';
 import DeleteUserModal from '../components/DeleteUserModal';
+import AddUserDialog from '../components/AddUserDialog';
+import StatusFilterIndicator from '../components/StatusFilterIndicator';
 import {
   useAdminUsers,
   type UserRoleFilter,
@@ -17,22 +19,11 @@ import {
   useBulkDeactivateUsers,
   useDeactivateUser,
 } from '../hooks/useUserStatusActions';
+import { useExportUsers } from '../hooks/useExportUsers';
+import { useCreateUser } from '../hooks/useCreateUser';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import type { AdminUser } from '@/features/admin/types/admin.types';
-
-const statusIndicatorClass: Record<UserStatusFilter, string> = {
-  all: 'bg-[#014AB3]',
-  active: 'bg-green-500',
-  blocked: 'bg-red-500',
-  deleted: 'bg-gray-400',
-};
+import type { AdminUser, CreateAdminUserPayload } from '@/features/admin/types/admin.types';
 
 export default function UsersPage() {
   const [search, setSearch] = useState('');
@@ -43,6 +34,7 @@ export default function UsersPage() {
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [actionUserId, setActionUserId] = useState<string | null>(null);
+  const [addUserOpen, setAddUserOpen] = useState(false);
 
   const { data, isLoading, isFetching } = useAdminUsers({
     status: statusFilter,
@@ -59,6 +51,8 @@ export default function UsersPage() {
   const { mutate: bulkActivateUsers, isPending: isBulkActivating } = useBulkActivateUsers();
   const { mutate: bulkDeactivateUsers, isPending: isBulkDeactivating } =
     useBulkDeactivateUsers();
+  const { mutate: exportUsers, isPending: isExporting } = useExportUsers();
+  const { mutate: createUser, isPending: isCreatingUser } = useCreateUser();
 
   const isBulkBusy = isBulkDeleting || isBulkActivating || isBulkDeactivating;
 
@@ -175,41 +169,45 @@ export default function UsersPage() {
     );
   };
 
+  const handleExport = () => {
+    exportUsers({
+      status: statusFilter,
+      role: roleFilter,
+      search,
+    });
+  };
+
+  const handleCreateUser = (payload: CreateAdminUserPayload) => {
+    createUser(payload, {
+      onSuccess: () => setAddUserOpen(false),
+    });
+  };
+
   return (
-    <TooltipProvider>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <PageHeader
           title="Users"
           description="Manage patient and admin accounts. Pharmacies are managed separately."
           actions={
             <>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Button type="button" variant="outline" disabled>
-                      <Download className="h-4 w-4" />
-                      Export
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Coming soon</TooltipContent>
-              </Tooltip>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleExport}
+                disabled={isExporting || isLoading}
+              >
+                <Download className="h-4 w-4" />
+                {isExporting ? 'Exporting...' : 'Export'}
+              </Button>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Button
-                      type="button"
-                      className="bg-[#014AB3] text-white hover:bg-[#0140a0]"
-                      disabled
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add New User
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Coming soon</TooltipContent>
-              </Tooltip>
+              <Button
+                type="button"
+                className="bg-[#014AB3] text-white hover:bg-[#0140a0]"
+                onClick={() => setAddUserOpen(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Add New User
+              </Button>
             </>
           }
         />
@@ -252,12 +250,7 @@ export default function UsersPage() {
                   setStatusFilter(value as UserStatusFilter);
                   resetPagination();
                 }}
-                icon={<Filter className="h-4 w-4" />}
-                indicator={
-                  <span
-                    className={`h-2 w-2 rounded-full ${statusIndicatorClass[statusFilter]}`}
-                  />
-                }
+                indicator={<StatusFilterIndicator status={statusFilter} />}
                 options={[
                   { value: 'all', label: 'Status: All' },
                   { value: 'active', label: 'Status: Active' },
@@ -371,7 +364,13 @@ export default function UsersPage() {
           onConfirm={handleDeleteConfirm}
           isLoading={isDeleting}
         />
+
+        <AddUserDialog
+          open={addUserOpen}
+          onOpenChange={setAddUserOpen}
+          onSubmit={handleCreateUser}
+          isLoading={isCreatingUser}
+        />
       </div>
-    </TooltipProvider>
   );
 }
