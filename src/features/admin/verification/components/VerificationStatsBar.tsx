@@ -5,18 +5,31 @@ import {
   XCircle,
 } from 'lucide-react';
 import StatsCard from '@/components/shared/StatsCard';
-import type { AdminPharmacy, AnalyticsOverview } from '@/features/admin/types/admin.types';
+import type { AnalyticsOverview } from '@/features/admin/types/admin.types';
 
 interface VerificationStatsBarProps {
-  pharmacies: AdminPharmacy[];
+  totalPending?: number | null;
   analytics?: AnalyticsOverview;
 }
 
+function formatQueueHint(analytics?: AnalyticsOverview, totalPending?: number | null): string {
+  if (
+    analytics?.pending_pharmacies_delta != null &&
+    analytics.pending_pharmacies_delta_label
+  ) {
+    const prefix = analytics.pending_pharmacies_delta >= 0 ? '+' : '';
+    return `${prefix}${analytics.pending_pharmacies_delta} ${analytics.pending_pharmacies_delta_label}`;
+  }
+
+  const count = analytics?.pending_pharmacies ?? totalPending ?? 0;
+  return count > 0 ? `${count} pending review` : 'No pending requests';
+}
+
 export default function VerificationStatsBar({
-  pharmacies,
+  totalPending,
   analytics,
 }: VerificationStatsBarProps) {
-  const queueSize = pharmacies.length;
+  const queueSize = analytics?.pending_pharmacies ?? totalPending ?? '—';
   const todaysApprovals = analytics?.todays_approvals ?? '—';
   const recentRejections = analytics?.recent_rejections ?? '—';
   const avgReviewTime =
@@ -25,14 +38,24 @@ export default function VerificationStatsBar({
       : '—';
 
   const approvalRate =
-    analytics?.approval_rate != null ? `${analytics.approval_rate}% approval rate` : undefined;
+    analytics?.approval_rate != null
+      ? `${analytics.approval_rate}% approval rate`
+      : undefined;
+
+  const queueHint = formatQueueHint(analytics, totalPending);
+  const queueHintClassName =
+    analytics?.pending_pharmacies_delta != null &&
+    analytics.pending_pharmacies_delta_label
+      ? 'text-green-600'
+      : undefined;
 
   return (
-    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatsCard
         label="Queue Size"
         value={queueSize}
-        hint={queueSize > 0 ? `${queueSize} pending review` : 'No pending requests'}
+        hint={queueHint}
+        hintClassName={queueHintClassName}
         icon={<Clock3 className="h-5 w-5" />}
         iconClassName="bg-[#014AB3]/10 text-[#014AB3]"
       />

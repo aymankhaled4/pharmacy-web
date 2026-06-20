@@ -52,7 +52,7 @@ export default function UsersTable({
 
   const columns = useMemo(
     () => [
-      { id: 'name', label: 'Name & Role' },
+      { id: 'name', label: 'Name' },
       { id: 'email', label: 'Email Address' },
       { id: 'role', label: 'Role' },
       { id: 'status', label: 'Status' },

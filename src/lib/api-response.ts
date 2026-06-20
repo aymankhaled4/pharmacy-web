@@ -32,7 +32,16 @@ export function extractCursorListResult<T>(data: unknown): CursorListResult<T> {
         ? record.next_cursor
         : null;
 
-  return { items, nextCursor };
+  const total =
+    typeof record.total === 'number'
+      ? record.total
+      : typeof record.meta === 'object' &&
+          record.meta &&
+          typeof (record.meta as Record<string, unknown>).total === 'number'
+        ? ((record.meta as Record<string, unknown>).total as number)
+        : null;
+
+  return { items, nextCursor, total };
 }
 
 function resolveUserStatus(raw: Record<string, unknown>): UserAccountStatus {
@@ -94,6 +103,14 @@ export function mapAdminPharmacy(raw: Record<string, unknown>) {
     status: (raw.status as 'pending' | 'approved' | 'rejected') ?? 'pending',
     rejection_reason:
       typeof raw.rejection_reason === 'string' ? raw.rejection_reason : null,
+    verified_by:
+      typeof raw.verified_by === 'string' && raw.verified_by.trim()
+        ? raw.verified_by
+        : null,
+    verified_at:
+      typeof raw.verified_at === 'string' && raw.verified_at.trim()
+        ? raw.verified_at
+        : null,
     created_at: String(raw.created_at ?? new Date().toISOString()),
   };
 }

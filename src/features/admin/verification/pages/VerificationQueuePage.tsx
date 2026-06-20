@@ -1,55 +1,57 @@
-import { useMemo, useState } from 'react';
-import { Building2, CheckCircle, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { CheckCircle, Search, SlidersHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import EmptyState from '@/components/shared/EmptyState';
 import PageHeader from '@/components/shared/PageHeader';
-import Pagination from '@/components/shared/Pagination';
-import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import CursorPagination from '@/components/shared/CursorPagination';
 import VerificationStatsBar from '../components/VerificationStatsBar';
+import VerificationTable from '../components/VerificationTable';
 import RejectModal from '../components/RejectModal';
-import { usePendingPharmacies } from '../hooks/usePendingPharmacies';
+import {
+  usePendingPharmacies,
+} from '../hooks/usePendingPharmacies';
 import { useAnalyticsOverview } from '../hooks/useAnalyticsOverview';
 import { useApprovePharmacy } from '../../pharmacies/hooks/useApprovePharmacy';
 import { useRejectPharmacy } from '../../pharmacies/hooks/useRejectPharmacy';
-import { formatRelativeTime } from '@/lib/format';
 import type { AdminPharmacy } from '@/features/admin/types/admin.types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-const PAGE_SIZE = 5;
+const SEARCH_DEBOUNCE_MS = 300;
 
 export default function VerificationQueuePage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [cursor, setCursor] = useState<string | undefined>();
+  const [cursorStack, setCursorStack] = useState<string[]>([]);
   const [rejectTarget, setRejectTarget] = useState<AdminPharmacy | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
 
-  const { data: pharmacies = [], isLoading } = usePendingPharmacies();
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(searchInput);
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setCursor(undefined);
+    setCursorStack([]);
+  }, [debouncedSearch]);
+
+  const { data, isLoading, isFetching } = usePendingPharmacies({
+    search: debouncedSearch,
+    cursor,
+  });
   const { data: analytics } = useAnalyticsOverview();
   const { mutate: approvePharmacy } = useApprovePharmacy();
   const { mutate: rejectPharmacy, isPending: isRejecting } = useRejectPharmacy();
 
-  const filteredPharmacies = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    const list = Array.isArray(pharmacies) ? pharmacies : [];
-
-    if (!query) return list;
-
-    return list.filter(
-      (pharmacy) =>
-        pharmacy.pharmacy_name?.toLowerCase().includes(query) ||
-        pharmacy.license_number?.toLowerCase().includes(query) ||
-        pharmacy.city?.toLowerCase().includes(query) ||
-        pharmacy.address?.toLowerCase().includes(query)
-    );
-  }, [pharmacies, search]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredPharmacies.length / PAGE_SIZE));
-  const paginatedPharmacies = filteredPharmacies.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
-  );
+  const pharmacies = data?.items ?? [];
+  const nextCursor = data?.nextCursor ?? null;
+  const totalPending = data?.total ?? analytics?.pending_pharmacies ?? null;
 
   const handleApprove = (pharmacyId: string) => {
     setApprovingId(pharmacyId);
@@ -69,71 +71,23 @@ export default function VerificationQueuePage() {
     );
   };
 
-  const columns: DataTableColumn<AdminPharmacy>[] = [
-    {
-      id: 'details',
-      header: 'Pharmacy Details',
-      cell: (pharmacy) => (
-        <div className="flex items-start gap-3 py-1">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#014AB3]/10 text-[#014AB3]">
-            <Building2 className="h-4 w-4" />
-          </div>
-          <div>
-            <p className="font-medium text-gray-900">{pharmacy.pharmacy_name}</p>
-            <p className="text-muted-foreground text-xs">
-              {pharmacy.address}, {pharmacy.city}
-            </p>
-            <p className="text-muted-foreground mt-1 text-xs">{pharmacy.phone}</p>
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 'license',
-      header: 'License Number',
-      cell: (pharmacy) => (
-        <span className="font-mono text-sm text-gray-700">{pharmacy.license_number}</span>
-      ),
-    },
-    {
-      id: 'submitted',
-      header: 'Submitted',
-      cell: (pharmacy) => (
-        <span className="text-sm text-gray-600">
-          {formatRelativeTime(pharmacy.created_at)}
-        </span>
-      ),
-    },
-    {
-      id: 'actions',
-      header: 'Verification',
-      headerClassName: 'text-right',
-      className: 'text-right',
-      cell: (pharmacy) => (
-        <div className="flex justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-            onClick={() => setRejectTarget(pharmacy)}
-            disabled={isRejecting || approvingId === pharmacy.id}
-          >
-            Reject
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            className="bg-[#014AB3] text-white hover:bg-[#0140a0]"
-            onClick={() => handleApprove(pharmacy.id)}
-            disabled={isRejecting || approvingId === pharmacy.id}
-          >
-            {approvingId === pharmacy.id ? 'Approving...' : 'Approve'}
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  const handleNextPage = () => {
+    if (!nextCursor) return;
+    setCursorStack((current) => [...current, cursor ?? '']);
+    setCursor(nextCursor);
+  };
+
+  const handlePreviousPage = () => {
+    setCursorStack((current) => {
+      const nextStack = [...current];
+      const previousCursor = nextStack.pop();
+      setCursor(previousCursor || undefined);
+      return nextStack;
+    });
+  };
+
+  const requestCount = totalPending ?? pharmacies.length;
+  const footerTotal = totalPending ?? pharmacies.length;
 
   return (
     <div className="space-y-6">
@@ -141,39 +95,44 @@ export default function VerificationQueuePage() {
         breadcrumbs="Dashboard / Pharmacy Verifications"
         title="Verification Queue"
         description="Review and validate pharmacy credentials to maintain network security."
-        actions={
-          <div className="relative w-full sm:w-72">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              value={search}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                setPage(1);
-              }}
-              placeholder="Search license or name..."
-              className="pl-9"
-            />
-          </div>
-        }
       />
 
-      <VerificationStatsBar
-        pharmacies={Array.isArray(pharmacies) ? pharmacies : []}
-        analytics={analytics}
-      />
+      <VerificationStatsBar totalPending={totalPending} analytics={analytics} />
 
       <Card className="shadow-sm">
-        <CardHeader className="border-b">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className="space-y-4 border-b">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <CardTitle>Pending Pharmacies</CardTitle>
               <CardDescription>
                 Records requiring administrative review and approval.
               </CardDescription>
             </div>
-            <Badge variant="secondary">
-              {Array.isArray(pharmacies) ? pharmacies.length : 0} Requests
+            <Badge className="w-fit bg-[#014AB3]/10 text-[#014AB3] hover:bg-[#014AB3]/10">
+              {requestCount} Request{requestCount === 1 ? '' : 's'}
             </Badge>
+          </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+            <div className="relative w-full sm:max-w-xs">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder="Search license or name..."
+                className="h-10 bg-gray-50 pl-9"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 shrink-0"
+              aria-label="Filter pharmacies"
+              disabled
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+            </Button>
           </div>
         </CardHeader>
 
@@ -182,31 +141,39 @@ export default function VerificationQueuePage() {
             <div className="px-6 py-16 text-center text-sm text-muted-foreground">
               Loading pending pharmacies...
             </div>
-          ) : filteredPharmacies.length === 0 ? (
+          ) : pharmacies.length === 0 ? (
             <div className="p-6">
               <EmptyState
                 icon={<CheckCircle className="h-12 w-12 text-green-500" />}
-                title="All caught up!"
-                description="No pharmacies are waiting for verification"
+                title={debouncedSearch ? 'No matches found' : 'All caught up!'}
+                description={
+                  debouncedSearch
+                    ? 'Try a different pharmacy name or license number.'
+                    : 'No pharmacies are waiting for verification.'
+                }
               />
             </div>
           ) : (
-            <DataTable
-              columns={columns}
-              data={paginatedPharmacies}
-              getRowKey={(pharmacy) => pharmacy.id}
-              emptyMessage="No pharmacies match your search."
+            <VerificationTable
+              pharmacies={pharmacies}
+              onApprove={handleApprove}
+              onReject={setRejectTarget}
+              approvingId={approvingId}
+              isRejecting={isRejecting}
             />
           )}
         </CardContent>
 
-        {!isLoading && filteredPharmacies.length > 0 && (
-          <div className="flex flex-col gap-3 border-t px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-muted-foreground text-sm">
-              Showing {paginatedPharmacies.length} of {filteredPharmacies.length} pending
-              records
-            </p>
-            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        {!isLoading && pharmacies.length > 0 && (
+          <div className="border-t px-4 py-4">
+            <CursorPagination
+              hasPrevious={cursorStack.length > 0}
+              hasNext={Boolean(nextCursor)}
+              onPrevious={handlePreviousPage}
+              onNext={handleNextPage}
+              isLoading={isFetching}
+              summary={`Showing ${pharmacies.length} of ${footerTotal} pending record${footerTotal === 1 ? '' : 's'}`}
+            />
           </div>
         )}
       </Card>

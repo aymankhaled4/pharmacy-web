@@ -14,6 +14,7 @@ export interface ApiResponse<T> {
 export interface CursorListResult<T> {
   items: T[];
   nextCursor: string | null;
+  total?: number | null;
 }
 
 export interface ApiError {

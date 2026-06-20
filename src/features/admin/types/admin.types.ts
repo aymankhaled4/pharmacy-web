@@ -9,7 +9,15 @@ export interface AdminPharmacy {
   city: string;
   status: PharmacyStatus;
   rejection_reason: string | null;
+  verified_by: string | null;
+  verified_at: string | null;
   created_at: string;
+}
+
+export interface AdminPharmaciesListResult {
+  items: AdminPharmacy[];
+  nextCursor: string | null;
+  total: number | null;
 }
 
 export interface CreateAdminUserPayload {
@@ -50,6 +58,8 @@ export interface BulkUserStatusResult {
 
 export interface AnalyticsOverview {
   pending_pharmacies?: number;
+  pending_pharmacies_delta?: number | null;
+  pending_pharmacies_delta_label?: string | null;
   todays_approvals?: number;
   recent_rejections?: number;
   avg_review_time_hours?: number;
