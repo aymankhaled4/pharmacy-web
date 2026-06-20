@@ -27,7 +27,8 @@ export const ENDPOINTS = {
   ADMIN_USERS: '/admin/users',
   ADMIN_USER_BY_ID: (id: string) => `/admin/users/${id}`,
   ADMIN_RESERVATIONS: '/admin/reservations',
+  ADMIN_ACTIVITY_FEED: '/admin/activity-feed',
   ADMIN_ANALYTICS_OVERVIEW: '/admin/analytics/overview',
   ADMIN_ANALYTICS_SEARCHED: '/admin/analytics/drugs/searched',
-  ADMIN_ANALYTICS_PURCHASED: '/admin/analytics/drugs/purchased',
+  ADMIN_ANALYTICS_PURCHASED: '/drugs/top-requested',
 } as const;
