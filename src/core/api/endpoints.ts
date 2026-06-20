@@ -31,7 +31,8 @@ export const ENDPOINTS = {
   ADMIN_USERS_BULK_ACTIVE: '/admin/users/bulk/active',
   ADMIN_USERS_BULK_INACTIVE: '/admin/users/bulk/inactive',
   ADMIN_RESERVATIONS: '/admin/reservations',
+  ADMIN_ACTIVITY_FEED: '/admin/activity-feed',
   ADMIN_ANALYTICS_OVERVIEW: '/admin/analytics/overview',
   ADMIN_ANALYTICS_SEARCHED: '/admin/analytics/drugs/searched',
-  ADMIN_ANALYTICS_PURCHASED: '/admin/analytics/drugs/purchased',
+  ADMIN_ANALYTICS_PURCHASED: '/drugs/top-requested',
 } as const;
