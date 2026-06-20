@@ -5,6 +5,7 @@ import {
   Building2,
   Users,
   ClipboardList,
+  ShieldCheck,
   LogOut,
   X,
 } from 'lucide-react';
@@ -16,8 +17,9 @@ import { cn } from '../lib/utils';
 
 const navItems = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/admin/pharmacies', icon: Building2, label: 'Pharmacies' },
+  { to: '/admin/verification', icon: ShieldCheck, label: 'Verification' },
   { to: '/admin/users', icon: Users, label: 'Users' },
+  { to: '/admin/pharmacies', icon: Building2, label: 'Pharmacies' },
   { to: '/admin/reservations', icon: ClipboardList, label: 'Reservations' },
 ];
 
@@ -25,6 +27,10 @@ const searchHints = [
   {
     path: '/admin/dashboard',
     hint: 'Search analytics, pharmacies, reservations, medicines...',
+  },
+  {
+    path: '/admin/verification',
+    hint: 'Search pending pharmacies by name, license, or location...',
   },
   {
     path: '/admin/pharmacies',
