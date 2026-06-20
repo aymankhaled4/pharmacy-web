@@ -39,7 +39,7 @@ export default function ConfirmModal({
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <DialogFooter className="border-t-0 bg-transparent p-0 pt-2 sm:justify-end">
+        <DialogFooter className="mx-0 mb-0 mt-2 gap-3 border-t border-gray-100 bg-transparent px-0 pt-5 pb-0 sm:justify-end">
           <Button
             type="button"
             variant="outline"

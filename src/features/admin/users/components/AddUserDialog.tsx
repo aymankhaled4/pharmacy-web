@@ -100,7 +100,7 @@ export default function AddUserDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="full_name">Full Name</Label>
             <Input
@@ -186,7 +186,7 @@ export default function AddUserDialog({
             </div>
           )}
 
-          <DialogFooter className="border-t-0 bg-transparent p-0 pt-2 sm:justify-end">
+          <DialogFooter className="mx-0 mb-0 mt-2 gap-3 border-t border-gray-100 bg-transparent px-0 pt-5 pb-0 sm:justify-end">
             <Button
               type="button"
               variant="outline"
