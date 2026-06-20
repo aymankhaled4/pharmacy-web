@@ -22,6 +22,7 @@ import ProfilePage from '@/features/pharmacy/profile/pages/ProfilePage';
 import AdminDashboardPage from '@/features/admin/dashboard/pages/AdminDashboardPage';
 import PharmaciesPage from '@/features/admin/pharmacies/pages/PharmaciesPage';
 import UsersPage from '@/features/admin/users/pages/UsersPage';
+import VerificationQueuePage from '@/features/admin/verification/pages/VerificationQueuePage';
 import AllReservationsPage from '@/features/admin/reservations/pages/AllReservationsPage';
 
 function UnauthorizedPage() {
@@ -71,6 +72,7 @@ export default function AppRouter() {
         <Route element={<RoleRoute allowedRole="admin" />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/admin/verification" element={<VerificationQueuePage />} />
             <Route path="/admin/pharmacies" element={<PharmaciesPage />} />
             <Route path="/admin/users" element={<UsersPage />} />
             <Route path="/admin/reservations" element={<AllReservationsPage />} />
