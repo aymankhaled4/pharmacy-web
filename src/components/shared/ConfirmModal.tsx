@@ -9,16 +9,57 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
+type ConfirmModalVariant = 'default' | 'destructive';
+
 interface ConfirmModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: ReactNode;
   confirmLabel?: string;
+  /** Alias for confirmLabel (reservations module) */
+  confirmText?: string;
   cancelLabel?: string;
+  /** Alias for cancelLabel (reservations module) */
+  cancelText?: string;
   onConfirm: () => void;
   isLoading?: boolean;
-  variant?: 'default' | 'destructive';
+  variant?: ConfirmModalVariant;
+  /** Alias for variant (reservations module) */
+  confirmVariant?: 'default' | 'outline' | 'secondary' | 'ghost' | 'destructive' | 'link';
+}
+
+function resolveConfirmButtonProps(
+  variant?: ConfirmModalVariant,
+  confirmVariant?: ConfirmModalProps['confirmVariant']
+) {
+  if (variant === 'default') {
+    return {
+      variant: 'default' as const,
+      className: 'bg-[#014AB3] text-white hover:bg-[#0140a0]',
+    };
+  }
+
+  if (variant === 'destructive') {
+    return { variant: 'destructive' as const, className: undefined };
+  }
+
+  if (confirmVariant === 'default') {
+    return {
+      variant: 'default' as const,
+      className: 'bg-[#014AB3] text-white hover:bg-[#0140a0]',
+    };
+  }
+
+  if (confirmVariant === 'destructive') {
+    return { variant: 'destructive' as const, className: undefined };
+  }
+
+  if (confirmVariant) {
+    return { variant: confirmVariant, className: undefined };
+  }
+
+  return { variant: 'destructive' as const, className: undefined };
 }
 
 export default function ConfirmModal({
@@ -26,12 +67,19 @@ export default function ConfirmModal({
   onOpenChange,
   title,
   description,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  confirmText,
+  cancelLabel,
+  cancelText,
   onConfirm,
   isLoading = false,
-  variant = 'default',
+  variant,
+  confirmVariant,
 }: ConfirmModalProps) {
+  const resolvedConfirmLabel = confirmLabel ?? confirmText ?? 'Confirm';
+  const resolvedCancelLabel = cancelLabel ?? cancelText ?? 'Cancel';
+  const confirmButton = resolveConfirmButtonProps(variant, confirmVariant);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={!isLoading} className="sm:max-w-md">
@@ -46,20 +94,16 @@ export default function ConfirmModal({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            {cancelLabel}
+            {resolvedCancelLabel}
           </Button>
           <Button
             type="button"
-            variant={variant === 'destructive' ? 'destructive' : 'default'}
-            className={
-              variant === 'default'
-                ? 'bg-[#014AB3] text-white hover:bg-[#0140a0]'
-                : undefined
-            }
+            variant={confirmButton.variant}
+            className={confirmButton.className}
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? 'Processing...' : confirmLabel}
+            {isLoading ? 'Processing...' : resolvedConfirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>
