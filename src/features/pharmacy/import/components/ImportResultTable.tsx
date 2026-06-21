@@ -1,5 +1,4 @@
 import { CheckCircle2, PlusCircle, XCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import type { ImportResult } from "../types/import.types";
 import { cn } from "@/lib/utils";
 
