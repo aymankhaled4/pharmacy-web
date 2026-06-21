@@ -1,26 +1,24 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
-  Upload,
   ClipboardList,
   Bell,
   User,
   LogOut,
-} from 'lucide-react';
-import { useAuthStore } from '../core/auth/auth.store';
-import { supabase } from '../core/supabase/supabase.client';
-import logo from '../assets/Dawak_logo.png';
-import icon from '../assets/Dawak_icon.png';
-import { cn } from '../lib/utils';
+} from "lucide-react";
+import { useAuthStore } from "../core/auth/auth.store";
+import { supabase } from "../core/supabase/supabase.client";
+import logo from "../assets/Dawak_logo.png";
+import icon from "../assets/Dawak_icon.png";
+import { cn } from "../lib/utils";
 
 const navItems = [
-  { to: '/pharmacy/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/pharmacy/inventory', icon: Package, label: 'Inventory' },
-  { to: '/pharmacy/import', icon: Upload, label: 'Import' },
-  { to: '/pharmacy/reservations', icon: ClipboardList, label: 'Reservations' },
-  { to: '/pharmacy/notifications', icon: Bell, label: 'Notifications' },
-  { to: '/pharmacy/profile', icon: User, label: 'Profile' },
+  { to: "/pharmacy/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/pharmacy/inventory", icon: Package, label: "Inventory" },
+  { to: "/pharmacy/reservations", icon: ClipboardList, label: "Reservations" },
+  { to: "/pharmacy/notifications", icon: Bell, label: "Notifications" },
+  { to: "/pharmacy/profile", icon: User, label: "Profile" },
 ];
 
 export default function PharmacyLayout() {
@@ -30,7 +28,7 @@ export default function PharmacyLayout() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     clearAuth();
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -50,13 +48,12 @@ export default function PharmacyLayout() {
               to={to}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
-                    ? 'bg-[#014AB3] text-white'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    ? "bg-[#014AB3] text-white"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
                 )
-              }
-            >
+              }>
               <Icon className="h-4 w-4" />
               {label}
             </NavLink>
@@ -67,8 +64,7 @@ export default function PharmacyLayout() {
         <div className="border-t p-3">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
-          >
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600">
             <LogOut className="h-4 w-4" />
             Logout
           </button>
@@ -82,7 +78,9 @@ export default function PharmacyLayout() {
           <div />
           <div className="flex items-center gap-3">
             <img src={icon} alt="" className="h-8 w-8 rounded-full" />
-            <span className="text-sm font-medium text-gray-700">{user?.email}</span>
+            <span className="text-sm font-medium text-gray-700">
+              {user?.email}
+            </span>
           </div>
         </header>
 

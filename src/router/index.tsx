@@ -1,23 +1,24 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
-import RoleRoute from './RoleRoute';
+import { Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+import RoleRoute from "./RoleRoute";
 
-import AuthLayout from '../layouts/AuthLayout';
-import PharmacyLayout from '../layouts/PharmacyLayout';
-import AdminLayout from '../layouts/AdminLayout';
+import AuthLayout from "../layouts/AuthLayout";
+import PharmacyLayout from "../layouts/PharmacyLayout";
+import AdminLayout from "../layouts/AdminLayout";
 
-import LoginPage from '../features/auth/pages/LoginPage';
-import RegisterPharmacyPage from '../features/auth/pages/RegisterPharmacyPage';
+import LoginPage from "../features/auth/pages/LoginPage";
+import RegisterPharmacyPage from "../features/auth/pages/RegisterPharmacyPage";
 
 // Pharmacy pages — placeholders until teammates build them
-import PharmacyDashboardPage from '@/features/pharmacy/dashboard/pages/PharmacyDashboardPage';
-
+import PharmacyDashboardPage from "@/features/pharmacy/dashboard/pages/PharmacyDashboardPage";
+import ImportPage from "@/features/pharmacy/import/pages/ImportPage";
+import InventoryPage from "@/features/pharmacy/inventory/pages/InventoryPage";
 
 // Admin pages — placeholders until teammates build them
-import AdminDashboardPage from '@/features/admin/dashboard/pages/AdminDashboardPage';
-import PharmaciesPage from '@/features/admin/pharmacies/pages/PharmaciesPage';
-import UsersPage from '@/features/admin/users/pages/UsersPage';
-import AllReservationsPage from '@/features/admin/reservations/pages/AllReservationsPage';
+import AdminDashboardPage from "@/features/admin/dashboard/pages/AdminDashboardPage";
+import PharmaciesPage from "@/features/admin/pharmacies/pages/PharmaciesPage";
+import UsersPage from "@/features/admin/users/pages/UsersPage";
+import AllReservationsPage from "@/features/admin/reservations/pages/AllReservationsPage";
 
 function UnauthorizedPage() {
   return (
@@ -50,7 +51,12 @@ export default function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route element={<RoleRoute allowedRole="pharmacy" />}>
           <Route element={<PharmacyLayout />}>
-            <Route path="/pharmacy/dashboard" element={<PharmacyDashboardPage />} />
+            <Route
+              path="/pharmacy/dashboard"
+              element={<PharmacyDashboardPage />}
+            />
+            <Route path="/pharmacy/inventory" element={<InventoryPage />} />
+            <Route path="/pharmacy/import" element={<ImportPage />} />
           </Route>
         </Route>
       </Route>
@@ -62,7 +68,10 @@ export default function AppRouter() {
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
             <Route path="/admin/pharmacies" element={<PharmaciesPage />} />
             <Route path="/admin/users" element={<UsersPage />} />
-            <Route path="/admin/reservations" element={<AllReservationsPage />} />
+            <Route
+              path="/admin/reservations"
+              element={<AllReservationsPage />}
+            />
           </Route>
         </Route>
       </Route>
