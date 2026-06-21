@@ -31,7 +31,7 @@ export default function FilterSelect({
   return (
     <div
       className={cn(
-        'relative flex h-10 min-w-[9.5rem] items-center gap-2 rounded-lg border border-gray-200 bg-white pl-3 pr-8',
+        'relative flex h-10 min-w-38 items-center gap-2 rounded-lg border border-gray-200 bg-white pl-3 pr-8',
         className
       )}
     >

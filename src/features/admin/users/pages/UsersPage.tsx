@@ -25,6 +25,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import type { AdminUser, CreateAdminUserPayload } from '@/features/admin/types/admin.types';
 
+const EMPTY_USERS: AdminUser[] = [];
+
 export default function UsersPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<UserStatusFilter>('active');
@@ -41,7 +43,7 @@ export default function UsersPage() {
     role: roleFilter,
     cursor,
   });
-  const users = data?.items ?? [];
+  const users = data?.items ?? EMPTY_USERS;
   const nextCursor = data?.nextCursor ?? null;
 
   const { mutate: deleteUser, isPending: isDeleting } = useSoftDeleteUser();

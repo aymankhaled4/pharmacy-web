@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ChevronDown, Phone } from 'lucide-react';
@@ -62,16 +62,16 @@ export default function AddUserDialog({
 }: AddUserDialogProps) {
   const {
     register,
+    control,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm<AddUserFormValues>({
     resolver: zodResolver(addUserSchema),
     defaultValues,
   });
 
-  const role = watch('role');
+  const role = useWatch({ control, name: 'role' });
 
   const handleClose = (nextOpen: boolean) => {
     if (!nextOpen) reset(defaultValues);

@@ -38,7 +38,7 @@ export default function AdminLayout() {
   const sidebarContent = (
     <>
       <div className="flex h-16 items-center justify-between border-b px-6">
-        <img src={logo} alt="Dawak" className="h-12 w-auto" />
+        <img src={logo} alt="Dawak" className="h-22 w-auto" />
         <button
           type="button"
           onClick={() => setIsSidebarOpen(false)}

@@ -31,15 +31,12 @@ export default function VerificationQueuePage() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setDebouncedSearch(searchInput);
+      setCursor(undefined);
+      setCursorStack([]);
     }, SEARCH_DEBOUNCE_MS);
 
     return () => window.clearTimeout(timer);
   }, [searchInput]);
-
-  useEffect(() => {
-    setCursor(undefined);
-    setCursorStack([]);
-  }, [debouncedSearch]);
 
   const { data, isLoading, isFetching } = usePendingPharmacies({
     search: debouncedSearch,

@@ -12,6 +12,7 @@ import { supabase } from '../core/supabase/supabase.client';
 import Topbar from '../components/shared/Topbar';
 import logo from '../assets/Dawak_logo.png';
 import { cn } from '../lib/utils';
+import PharmacyNotificationsDropdown from '../features/pharmacy/notifications/components/PharmacyNotificationsDropdown';
 
 const navItems = [
   { to: '/pharmacy/inventory', icon: Package, label: 'Inventory' },
@@ -33,7 +34,7 @@ export default function PharmacyLayout() {
   const sidebarContent = (
     <>
       <div className="flex h-16 items-center justify-between border-b px-6">
-        <img src={logo} alt="Dawak" className="h-12 w-auto" />
+        <img src={logo} alt="Dawak" className="h-22 w-auto" />
         <button
           type="button"
           onClick={() => setIsSidebarOpen(false)}
@@ -100,6 +101,7 @@ export default function PharmacyLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
           fallbackName="Pharmacy User"
+          notificationDropdown={<PharmacyNotificationsDropdown />}
           onOpenSidebar={() => setIsSidebarOpen(true)}
         />
 

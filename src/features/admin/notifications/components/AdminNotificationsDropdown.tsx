@@ -47,7 +47,7 @@ export default function AdminNotificationsDropdown() {
           <div className="border-b px-4 py-3">
             <h2 className="text-sm font-semibold text-gray-950">Notification</h2>
           </div>
-          <div className="max-h-[28rem] overflow-y-auto p-4">
+          <div className="max-h-112 overflow-y-auto p-4">
             <ActivityFeedList
               items={activityFeed.data?.items ?? []}
               isLoading={activityFeed.isLoading}

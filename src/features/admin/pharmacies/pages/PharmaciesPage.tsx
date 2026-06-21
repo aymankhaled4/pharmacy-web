@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 
 import PharmacyTable from '../components/PharmacyTable'
 import { useAdminPharmacies } from '../hooks/useAdminPharmacies'
-import type { PharmacyStatus } from '../types'
+import type { AdminPharmacy, PharmacyStatus } from '../types'
 
 type StatusFilter = Exclude<PharmacyStatus, 'pending'> | 'all'
 
@@ -22,6 +22,8 @@ const statusOptions: Array<{ value: StatusFilter; label: string }> = [
   { value: 'approved', label: 'Approved' },
   { value: 'rejected', label: 'Rejected' },
 ]
+
+const EMPTY_PHARMACIES: AdminPharmacy[] = []
 
 function formatCount(value: number) {
   return new Intl.NumberFormat('en-US').format(value)
@@ -34,8 +36,8 @@ export default function PharmaciesPage() {
   const allPharmaciesQuery = useAdminPharmacies('all')
   const pharmaciesQuery = useAdminPharmacies(statusFilter)
 
-  const allPharmacies = allPharmaciesQuery.data ?? []
-  const pharmacies = pharmaciesQuery.data ?? []
+  const allPharmacies = allPharmaciesQuery.data ?? EMPTY_PHARMACIES
+  const pharmacies = pharmaciesQuery.data ?? EMPTY_PHARMACIES
 
   const stats = useMemo(
     () => ({
