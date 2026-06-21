@@ -10,6 +10,7 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       setAuth: (token: string, role: UserRole, user: AuthUser) =>
         set({ token, role, user }),
+      setToken: (token: string) => set({ token }),
       clearAuth: () => set({ token: null, role: null, user: null }),
     }),
     {

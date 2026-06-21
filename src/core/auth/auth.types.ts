@@ -11,5 +11,6 @@ export interface AuthStore {
   role: UserRole | null;
   user: AuthUser | null;
   setAuth: (token: string, role: UserRole, user: AuthUser) => void;
+  setToken: (token: string) => void;
   clearAuth: () => void;
 }
