@@ -10,11 +10,9 @@ import LoginPage from "../features/auth/pages/LoginPage";
 import RegisterPharmacyPage from "../features/auth/pages/RegisterPharmacyPage";
 
 // Pharmacy pages — placeholders until teammates build them
-import PharmacyDashboardPage from "@/features/pharmacy/dashboard/pages/PharmacyDashboardPage";
 import InventoryPage from "@/features/pharmacy/inventory/pages/InventoryPage";
 import ImportPage from "@/features/pharmacy/import/pages/ImportPage";
 import ReservationsPage from "@/features/pharmacy/reservations/pages/ReservationsPage";
-import NotificationsPage from "@/features/pharmacy/notifications/pages/NotificationsPage";
 import ProfilePage from "@/features/pharmacy/profile/pages/ProfilePage";
 
 // Admin pages — placeholders until teammates build them
@@ -58,21 +56,13 @@ export default function AppRouter() {
           <Route element={<PharmacyLayout />}>
             <Route
               path="/pharmacy"
-              element={<Navigate to="/pharmacy/dashboard" replace />}
-            />
-            <Route
-              path="/pharmacy/dashboard"
-              element={<PharmacyDashboardPage />}
+              element={<Navigate to="/pharmacy/inventory" replace />}
             />
             <Route path="/pharmacy/inventory" element={<InventoryPage />} />
             <Route path="/pharmacy/import" element={<ImportPage />} />
             <Route
               path="/pharmacy/reservations"
               element={<ReservationsPage />}
-            />
-            <Route
-              path="/pharmacy/notifications"
-              element={<NotificationsPage />}
             />
             <Route path="/pharmacy/profile" element={<ProfilePage />} />
           </Route>

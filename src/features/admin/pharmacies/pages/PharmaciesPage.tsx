@@ -15,12 +15,13 @@ import PharmacyTable from '../components/PharmacyTable'
 import { useAdminPharmacies } from '../hooks/useAdminPharmacies'
 import type { AdminPharmacy, PharmacyStatus } from '../types'
 
-type StatusFilter = Exclude<PharmacyStatus, 'pending'> | 'all'
+type StatusFilter = PharmacyStatus | 'all'
 
 const statusOptions: Array<{ value: StatusFilter; label: string }> = [
   { value: 'all', label: 'All Status' },
   { value: 'approved', label: 'Approved' },
-  { value: 'rejected', label: 'Rejected' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'rejected', label: 'Rejected' }
 ]
 
 const EMPTY_PHARMACIES: AdminPharmacy[] = []

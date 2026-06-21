@@ -56,8 +56,8 @@ export default function Topbar({
   }, []);
 
   const displayName = useMemo(
-    () => user?.name || metadataName || toTitleName(user?.email, fallbackName),
-    [fallbackName, metadataName, user?.email, user?.name]
+  () => fallbackName !== 'Admin User' ? fallbackName : (user?.name || metadataName || toTitleName(user?.email, fallbackName)),
+  [fallbackName, metadataName, user?.email, user?.name]
   );
   const initial = displayName.trim().charAt(0).toUpperCase() || 'A';
 

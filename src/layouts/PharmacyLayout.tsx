@@ -6,8 +6,6 @@ import {
   User,
   LogOut,
   X,
-  LayoutDashboard,
-  Bell,
 } from "lucide-react";
 import { useAuthStore } from "../core/auth/auth.store";
 import { supabase } from "../core/supabase/supabase.client";
@@ -15,12 +13,11 @@ import Topbar from "../components/shared/Topbar";
 import logo from "../assets/Dawak_logo.png";
 import { cn } from "../lib/utils";
 import PharmacyNotificationsDropdown from "../features/pharmacy/notifications/components/PharmacyNotificationsDropdown";
+import { usePharmacyProfile } from '../features/pharmacy/profile/hooks/useUpdateProfile';
 
 const navItems = [
-  { to: "/pharmacy/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/pharmacy/inventory", icon: Package, label: "Inventory" },
   { to: "/pharmacy/reservations", icon: ClipboardList, label: "Reservations" },
-  { to: "/pharmacy/notifications", icon: Bell, label: "Notifications" },
   { to: "/pharmacy/profile", icon: User, label: "Profile" },
 ];
 
@@ -28,6 +25,7 @@ export default function PharmacyLayout() {
   const { clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { data: profile } = usePharmacyProfile();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -101,10 +99,10 @@ export default function PharmacyLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
-          fallbackName="Pharmacy User"
-          notificationDropdown={<PharmacyNotificationsDropdown />}
-          onOpenSidebar={() => setIsSidebarOpen(true)}
-        />
+        fallbackName={profile?.pharmacy_name ?? 'Pharmacy User'}
+        notificationDropdown={<PharmacyNotificationsDropdown />}
+        onOpenSidebar={() => setIsSidebarOpen(true)}
+      />
 
         <main className="flex-1 p-4 sm:p-6">
           <Outlet />

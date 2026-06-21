@@ -13,8 +13,8 @@ const styles: Record<PharmacyStatus, string> = {
 
 const labels: Record<PharmacyStatus, string> = {
   pending: 'Pending',
-  approved: 'Active',
-  rejected: 'Suspended',
+  approved: 'Approved',
+  rejected: 'Rejected',
 }
 
 const icons: Record<PharmacyStatus, typeof Clock3> = {

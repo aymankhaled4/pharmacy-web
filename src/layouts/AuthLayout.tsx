@@ -5,7 +5,7 @@ export default function AuthLayout() {
   const { token, role } = useAuthStore();
 
   // Already logged in — redirect away from auth pages
-  if (token && role === 'pharmacy') return <Navigate to="/pharmacy/dashboard" replace />;
+  if (token && role === 'pharmacy') return <Navigate to="/pharmacy/inventory" replace />;
   if (token && role === 'admin') return <Navigate to="/admin/dashboard" replace />;
 
   return (

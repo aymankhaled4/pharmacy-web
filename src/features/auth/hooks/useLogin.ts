@@ -68,7 +68,7 @@ export function useLogin() {
 
       setAuth(token, role, user);
 
-      if (role === 'pharmacy') navigate('/pharmacy/dashboard');
+      if (role === 'pharmacy') navigate('/pharmacy/inventory');
       else if (role === 'admin') navigate('/admin/dashboard');
     },
   });
