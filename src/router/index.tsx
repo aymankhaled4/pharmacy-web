@@ -11,13 +11,18 @@ import RegisterPharmacyPage from "../features/auth/pages/RegisterPharmacyPage";
 
 // Pharmacy pages — placeholders until teammates build them
 import PharmacyDashboardPage from "@/features/pharmacy/dashboard/pages/PharmacyDashboardPage";
-import ImportPage from "@/features/pharmacy/import/pages/ImportPage";
 import InventoryPage from "@/features/pharmacy/inventory/pages/InventoryPage";
+import ImportPage from "@/features/pharmacy/import/pages/ImportPage";
+import ReservationsPage from "@/features/pharmacy/reservations/pages/ReservationsPage";
+import NotificationsPage from "@/features/pharmacy/notifications/pages/NotificationsPage";
+import ProfilePage from "@/features/pharmacy/profile/pages/ProfilePage";
 
 // Admin pages — placeholders until teammates build them
 import AdminDashboardPage from "@/features/admin/dashboard/pages/AdminDashboardPage";
+import AdminActivityFeedPage from "@/features/admin/dashboard/pages/AdminActivityFeedPage";
 import PharmaciesPage from "@/features/admin/pharmacies/pages/PharmaciesPage";
 import UsersPage from "@/features/admin/users/pages/UsersPage";
+import VerificationQueuePage from "@/features/admin/verification/pages/VerificationQueuePage";
 import AllReservationsPage from "@/features/admin/reservations/pages/AllReservationsPage";
 
 function UnauthorizedPage() {
@@ -52,11 +57,24 @@ export default function AppRouter() {
         <Route element={<RoleRoute allowedRole="pharmacy" />}>
           <Route element={<PharmacyLayout />}>
             <Route
+              path="/pharmacy"
+              element={<Navigate to="/pharmacy/dashboard" replace />}
+            />
+            <Route
               path="/pharmacy/dashboard"
               element={<PharmacyDashboardPage />}
             />
             <Route path="/pharmacy/inventory" element={<InventoryPage />} />
             <Route path="/pharmacy/import" element={<ImportPage />} />
+            <Route
+              path="/pharmacy/reservations"
+              element={<ReservationsPage />}
+            />
+            <Route
+              path="/pharmacy/notifications"
+              element={<NotificationsPage />}
+            />
+            <Route path="/pharmacy/profile" element={<ProfilePage />} />
           </Route>
         </Route>
       </Route>
@@ -66,6 +84,14 @@ export default function AppRouter() {
         <Route element={<RoleRoute allowedRole="admin" />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route
+              path="/admin/activity-feed"
+              element={<AdminActivityFeedPage />}
+            />
+            <Route
+              path="/admin/verification"
+              element={<VerificationQueuePage />}
+            />
             <Route path="/admin/pharmacies" element={<PharmaciesPage />} />
             <Route path="/admin/users" element={<UsersPage />} />
             <Route

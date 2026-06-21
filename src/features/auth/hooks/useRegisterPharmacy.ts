@@ -11,6 +11,8 @@ export interface RegisterPharmacyPayload {
   license_number: string;
   email: string;
   password: string;
+  latitude: number;
+  longitude: number;
 }
 
 export function useRegisterPharmacy() {
@@ -18,11 +20,7 @@ export function useRegisterPharmacy() {
 
   return useMutation({
     mutationFn: (payload: RegisterPharmacyPayload) =>
-      api.post(ENDPOINTS.PHARMACY_REGISTER, {
-        ...payload,
-        latitude: 0,
-        longitude: 0,
-      }),
+      api.post(ENDPOINTS.PHARMACY_REGISTER, payload),
     onSuccess: () => {
       navigate('/login', {
         state: { successMessage: 'Registration submitted. Please wait for admin approval.' },

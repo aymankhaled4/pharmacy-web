@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   Building2,
   Users,
-  ClipboardList,
+  ShieldCheck,
   LogOut,
   X,
 } from 'lucide-react';
@@ -13,31 +13,13 @@ import { supabase } from '../core/supabase/supabase.client';
 import Topbar from '../components/shared/Topbar';
 import logo from '../assets/Dawak_logo.png';
 import { cn } from '../lib/utils';
+import AdminNotificationsDropdown from '../features/admin/notifications/components/AdminNotificationsDropdown';
 
 const navItems = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/admin/pharmacies', icon: Building2, label: 'Pharmacies' },
+  { to: '/admin/verification', icon: ShieldCheck, label: 'Verification' },
   { to: '/admin/users', icon: Users, label: 'Users' },
-  { to: '/admin/reservations', icon: ClipboardList, label: 'Reservations' },
-];
-
-const searchHints = [
-  {
-    path: '/admin/dashboard',
-    hint: 'Search analytics, pharmacies, reservations, medicines...',
-  },
-  {
-    path: '/admin/pharmacies',
-    hint: 'Search pharmacies by name, license, location, status...',
-  },
-  {
-    path: '/admin/users',
-    hint: 'Search users by name, email, role, account status...',
-  },
-  {
-    path: '/admin/reservations',
-    hint: 'Search reservations by patient, pharmacy, medicine, status...',
-  },
+  { to: '/admin/pharmacies', icon: Building2, label: 'Pharmacies' },
 ];
 
 export default function AdminLayout() {
@@ -45,6 +27,7 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const isDashboard = location.pathname.startsWith('/admin/dashboard');
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -55,7 +38,7 @@ export default function AdminLayout() {
   const sidebarContent = (
     <>
       <div className="flex h-16 items-center justify-between border-b px-6">
-        <img src={logo} alt="Dawak" className="h-8 w-auto" />
+        <img src={logo} alt="Dawak" className="h-22 w-auto" />
         <button
           type="button"
           onClick={() => setIsSidebarOpen(false)}
@@ -121,10 +104,8 @@ export default function AdminLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
-          searchPlaceholder={
-            searchHints.find((item) => location.pathname.startsWith(item.path))?.hint ??
-            'Search admin workspace...'
-          }
+          showSearch={!isDashboard}
+          notificationDropdown={<AdminNotificationsDropdown />}
           onOpenSidebar={() => setIsSidebarOpen(true)}
         />
 

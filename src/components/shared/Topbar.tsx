@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Bell, Menu, Search } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Bell, Menu } from 'lucide-react';
 import { useAuthStore } from '../../core/auth/auth.store';
 import { supabase } from '../../core/supabase/supabase.client';
 
 interface TopbarProps {
-  searchPlaceholder: string;
   onOpenSidebar?: () => void;
+  fallbackName?: string;
+  showSearch?: boolean;
+  notificationDropdown?: ReactNode;
 }
 
-function toTitleName(email?: string | null) {
-  if (!email) return 'Admin User';
+function toTitleName(email?: string | null, fallbackName = 'Admin User') {
+  if (!email) return fallbackName;
 
   return email
     .split('@')[0]
@@ -17,7 +20,7 @@ function toTitleName(email?: string | null) {
     .split(' ')
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ') || 'Admin User';
+    .join(' ') || fallbackName;
 }
 
 function getMetadataName(metadata: Record<string, unknown> | null | undefined) {
@@ -31,7 +34,11 @@ function getMetadataName(metadata: Record<string, unknown> | null | undefined) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
-export default function Topbar({ searchPlaceholder, onOpenSidebar }: TopbarProps) {
+export default function Topbar({
+  onOpenSidebar,
+  fallbackName = 'Admin User',
+  notificationDropdown,
+}: TopbarProps) {
   const user = useAuthStore((state) => state.user);
   const [metadataName, setMetadataName] = useState<string | undefined>(user?.name);
 
@@ -49,8 +56,8 @@ export default function Topbar({ searchPlaceholder, onOpenSidebar }: TopbarProps
   }, []);
 
   const displayName = useMemo(
-    () => user?.name || metadataName || toTitleName(user?.email),
-    [metadataName, user?.email, user?.name]
+    () => user?.name || metadataName || toTitleName(user?.email, fallbackName),
+    [fallbackName, metadataName, user?.email, user?.name]
   );
   const initial = displayName.trim().charAt(0).toUpperCase() || 'A';
 
@@ -66,26 +73,19 @@ export default function Topbar({ searchPlaceholder, onOpenSidebar }: TopbarProps
           >
             <Menu className="h-5 w-5" />
           </button>
-
-<div className="relative w-full min-w-0 sm:w-[22rem] lg:w-[26rem]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-         <input
-  type="search"
-  placeholder={searchPlaceholder}
-  className="h-9 w-full rounded-lg border bg-gray-50 pl-10 pr-3 text-xs text-gray-800 outline-none transition focus:border-[#014AB3] focus:bg-white focus:ring-2 focus:ring-[#014AB3]/10"
-/>
-          </div>
         </div>
 
         <div className="flex items-center justify-end gap-3">
-          <button
-            type="button"
-            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition-colors hover:text-[#014AB3]"
-            aria-label="Notifications"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-          </button>
+          {notificationDropdown ?? (
+            <button
+              type="button"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition-colors hover:text-[#014AB3]"
+              aria-label="Notifications"
+            >
+              <Bell className="h-5 w-5" />
+              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+            </button>
+          )}
 
           <div className="flex min-w-0 items-center gap-3">
             <span className="max-w-36 truncate text-sm font-medium text-gray-700 sm:max-w-52">
