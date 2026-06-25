@@ -1,7 +1,7 @@
 export type InventoryStatus = 'active' | 'inactive' | 'expired' | 'out_of_stock';
 
 export interface DrugInfo {
-    id: string;
+    drug_id: string;
     brand_name: string;
     brand_name_ar?: string;
     generic_name?: string;
@@ -42,7 +42,7 @@ export interface InventoryFilters {
 }
 
 export interface AddInventoryPayload {
-    drug_name: string;
+    drug_id: string;
     quantity: number;
     selling_price: number;
     expiry_date?: string;

@@ -1,19 +1,13 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import {
-  Package,
-  ClipboardList,
-  User,
-  LogOut,
-  X,
-} from "lucide-react";
+import { Package, ClipboardList, User, LogOut, X } from "lucide-react";
 import { useAuthStore } from "../core/auth/auth.store";
 import { supabase } from "../core/supabase/supabase.client";
 import Topbar from "../components/shared/Topbar";
 import logo from "../assets/Dawak_logo.png";
 import { cn } from "../lib/utils";
 import PharmacyNotificationsDropdown from "../features/pharmacy/notifications/components/PharmacyNotificationsDropdown";
-import { usePharmacyProfile } from '../features/pharmacy/profile/hooks/useUpdateProfile';
+import { usePharmacyProfile } from "../features/pharmacy/profile/hooks/useUpdateProfile";
 
 const navItems = [
   { to: "/pharmacy/inventory", icon: Package, label: "Inventory" },
@@ -36,7 +30,7 @@ export default function PharmacyLayout() {
   const sidebarContent = (
     <>
       <div className="flex h-16 items-center justify-between border-b px-6">
-        <img src={logo} alt="Dawak" className="h-22 w-auto" />
+        <img src={logo} alt="Dawak" className="h-20 w-auto" />
         <button
           type="button"
           onClick={() => setIsSidebarOpen(false)}
@@ -69,7 +63,7 @@ export default function PharmacyLayout() {
       <div className="border-t p-3">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600">
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600 cursor-pointer">
           <LogOut className="h-4 w-4" />
           Logout
         </button>
@@ -99,10 +93,10 @@ export default function PharmacyLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
-        fallbackName={profile?.pharmacy_name ?? 'Pharmacy User'}
-        notificationDropdown={<PharmacyNotificationsDropdown />}
-        onOpenSidebar={() => setIsSidebarOpen(true)}
-      />
+          fallbackName={profile?.pharmacy_name ?? "Pharmacy User"}
+          notificationDropdown={<PharmacyNotificationsDropdown />}
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+        />
 
         <main className="flex-1 p-4 sm:p-6">
           <Outlet />

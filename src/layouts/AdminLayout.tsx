@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Building2,
@@ -7,19 +7,19 @@ import {
   ShieldCheck,
   LogOut,
   X,
-} from 'lucide-react';
-import { useAuthStore } from '../core/auth/auth.store';
-import { supabase } from '../core/supabase/supabase.client';
-import Topbar from '../components/shared/Topbar';
-import logo from '../assets/Dawak_logo.png';
-import { cn } from '../lib/utils';
-import AdminNotificationsDropdown from '../features/admin/notifications/components/AdminNotificationsDropdown';
+} from "lucide-react";
+import { useAuthStore } from "../core/auth/auth.store";
+import { supabase } from "../core/supabase/supabase.client";
+import Topbar from "../components/shared/Topbar";
+import logo from "../assets/Dawak_logo.png";
+import { cn } from "../lib/utils";
+import AdminNotificationsDropdown from "../features/admin/notifications/components/AdminNotificationsDropdown";
 
 const navItems = [
-  { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/admin/verification', icon: ShieldCheck, label: 'Verification' },
-  { to: '/admin/users', icon: Users, label: 'Users' },
-  { to: '/admin/pharmacies', icon: Building2, label: 'Pharmacies' },
+  { to: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/admin/verification", icon: ShieldCheck, label: "Verification" },
+  { to: "/admin/users", icon: Users, label: "Users" },
+  { to: "/admin/pharmacies", icon: Building2, label: "Pharmacies" },
 ];
 
 export default function AdminLayout() {
@@ -27,24 +27,23 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const isDashboard = location.pathname.startsWith('/admin/dashboard');
+  const isDashboard = location.pathname.startsWith("/admin/dashboard");
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     clearAuth();
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
   };
 
   const sidebarContent = (
     <>
       <div className="flex h-16 items-center justify-between border-b px-6">
-        <img src={logo} alt="Dawak" className="h-22 w-auto" />
+        <img src={logo} alt="Dawak" className="h-20 w-auto" />
         <button
           type="button"
           onClick={() => setIsSidebarOpen(false)}
           className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden"
-          aria-label="Close navigation"
-        >
+          aria-label="Close navigation">
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -57,13 +56,12 @@ export default function AdminLayout() {
             onClick={() => setIsSidebarOpen(false)}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? 'bg-[#014AB3] text-white'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  ? "bg-[#014AB3] text-white"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
               )
-            }
-          >
+            }>
             <Icon className="h-4 w-4" />
             {label}
           </NavLink>
@@ -73,8 +71,7 @@ export default function AdminLayout() {
       <div className="border-t p-3">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
-        >
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600 cursor-pointer">
           <LogOut className="h-4 w-4" />
           Logout
         </button>
